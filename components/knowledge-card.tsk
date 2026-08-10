@@ -1,0 +1,63 @@
+import Link from 'next/link'
+import { ChevronRight, BookOpen } from 'lucide-react'
+import type { KnowledgePoint } from '@/lib/knowledge-points'
+import { cn } from '@/lib/utils'
+
+function weaknessMeta(weakness: number) {
+  if (weakness >= 70) {
+    return { label: '亟需巩固', bar: 'bg-destructive', text: 'text-destructive', track: 'bg-destructive/15' }
+  }
+  if (weakness >= 45) {
+    return { label: '待提升', bar: 'bg-chart-3', text: 'text-chart-3', track: 'bg-chart-3/15' }
+  }
+  return { label: '较扎实', bar: 'bg-primary', text: 'text-primary', track: 'bg-primary/15' }
+}
+
+export function KnowledgeCard({ point }: { point: KnowledgePoint }) {
+  const meta = weaknessMeta(point.weakness)
+
+  return (
+    <Link
+      href={`/courseware/${point.id}`}
+      className="group flex items-stretch gap-4 rounded-3xl border border-border bg-card p-5 shadow-sm transition-all active:scale-[0.99] hover:shadow-md hover:border-primary/40"
+    >
+      <div className="flex flex-1 flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-bold text-card-foreground text-balance">{point.name}</h2>
+          <span className={cn('rounded-full px-2 py-0.5 text-xs font-semibold', meta.track, meta.text)}>
+            {meta.label}
+          </span>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">薄弱指数</span>
+            <span className={cn('font-bold tabular-nums', meta.text)}>{point.weakness}%</span>
+          </div>
+          <div className={cn('h-2 w-full overflow-hidden rounded-full', meta.track)}>
+            <div
+              className={cn('h-full rounded-full transition-all', meta.bar)}
+              style={{ width: `${point.weakness}%` }}
+              role="progressbar"
+              aria-valuenow={point.weakness}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`${point.name}薄弱指数`}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <BookOpen className="size-3.5 shrink-0" aria-hidden="true" />
+          <span className="truncate">{point.textbook}</span>
+        </div>
+      </div>
+
+      <div className="flex items-center">
+        <span className="flex size-8 items-center justify-center rounded-full bg-secondary text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+          <ChevronRight className="size-5" aria-hidden="true" />
+        </span>
+      </div>
+    </Link>
+  )
+}
